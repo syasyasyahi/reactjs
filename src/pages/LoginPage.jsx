@@ -1,14 +1,28 @@
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Card, Button, Form, FormLabel, FormControl, FormGroup } from "react-bootstrap";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleLogin = (e) => {
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email == "admin@gmail.com" && password == "12345") {
-      alert("Login succesfull!!");
-    } else {
-      alert("Your email or password is wrong!");
+    setError("");
+    try {
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email,
+        password,
+      });
+
+      if (response.status == 200) {
+        localStorage.setItem("token", response.data.token);
+        navigate ("/user");
+      } 
+    } catch (error) {
+       setError(error.response.data.message || "Login Failed");
+      console.log(error.error);
     }
   };
   return (
